@@ -1,0 +1,19 @@
+html, body {
+  overflow: hidden !important;
+  height: 100% !important;
+}
+
+#root {
+  height: 100% !important;
+  overflow: hidden !important;
+  max-width: 430px; /* phone width */
+  margin: 0 auto; /* center it on desktop */
+}
+
+.main-snap-container {
+  scrollbar-width: none;
+}
+
+.main-snap-container::-webkit-scrollbar {
+  display: none;
+}
