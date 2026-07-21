@@ -25,8 +25,8 @@ export default function CountdownSection() {
 
   const slideStyle = {
     position: 'relative', 
-    height: '100vh',              
-    minHeight: '100vh',
+    height: '100dvh',              
+    minHeight: '100dvh',
     width: '100%',
     scrollSnapAlign: 'start',
     backgroundImage: 'url(/FamBackground.webp)',

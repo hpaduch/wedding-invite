@@ -287,7 +287,7 @@ export default function AdminDashboard() {
 }
 
 // --- Styles ---
-const authScreenStyle = { height: '100vh', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#f5f5f5', padding: '20px', boxSizing: 'border-box' };
+const authScreenStyle = { height: '100dvh', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#f5f5f5', padding: '20px', boxSizing: 'border-box' };
 const cardStyle = { background: 'white', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: '320px', textAlign: 'center' };
 const inputStyle = { padding: '10px 12px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '0.9rem', outline: 'none' };
 const selectStyle = { padding: '10px 4px', border: 'none', background: 'transparent', fontSize: '0.9rem', outline: 'none', cursor: 'pointer' };

@@ -20,7 +20,7 @@ export default function HeroSlide() {
     <div 
       ref={slideRef}
       style={{
-        height: '100vh', width: '100%', position: 'relative', overflow: 'hidden',
+        height: '100dvh', width: '100%', position: 'relative', overflow: 'hidden',
         scrollSnapAlign: 'start', 
         display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'white', textAlign: 'center',
         backgroundColor: '#000'

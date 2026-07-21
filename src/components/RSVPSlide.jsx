@@ -74,7 +74,7 @@ export default function RsvpSection() {
 
   const slideStyle = { 
     position: 'relative', 
-    minHeight: '100vh', 
+    minHeight: '100dvh', 
     width: '100%', 
     scrollSnapAlign: 'start', 
     backgroundImage: 'url(/Animated.webp)', 
@@ -239,7 +239,7 @@ export default function RsvpSection() {
 
               <motion.a 
                 variants={textAnimation}
-                href={`tel:+${side === 'Praveena' ? '919440983695' : '917893959094'}`} 
+                href={`tel:+${side === 'Praveena' ? '919502683695' : '917893959094'}`} 
                 style={{ 
                   display: 'inline-flex', 
                   alignItems: 'center',

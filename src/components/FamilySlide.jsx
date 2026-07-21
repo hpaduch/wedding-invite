@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 export default function FamilySlide() {
   const slideStyle = {
     position: 'relative', // NEW: Required to anchor the absolute animated arrow
-    height: '100vh', 
+    height: '100dvh', 
     width: '100%',
     boxSizing: 'border-box',
     scrollSnapAlign: 'start',

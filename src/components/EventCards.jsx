@@ -79,7 +79,7 @@ export default function EventCards() {
       {events.map((event, index) => (
         <div key={index} style={{
           position: 'relative', // NEW: Required to anchor the absolute animated arrow
-          height: '100vh', width: '100%', scrollSnapAlign: 'start',
+          height: '100dvh', width: '100%', scrollSnapAlign: 'start',
           backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.6)), url(${event.bgImage})`,
           backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center',
           display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
