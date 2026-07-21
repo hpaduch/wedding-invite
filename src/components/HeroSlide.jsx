@@ -1,17 +1,61 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
 export default function HeroSlide() {
+  const containerRef = useRef(null);
   const videoRef = useRef(null);
   const bgVideoRef = useRef(null); 
+  const [showPlayOverlay, setShowPlayOverlay] = useState(false);
 
   useEffect(() => {
-    if (bgVideoRef.current) {
-      bgVideoRef.current.play().catch(() => {});
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Play background video
+            if (bgVideoRef.current) {
+              bgVideoRef.current.defaultMuted = true;
+              bgVideoRef.current.muted = true;
+              bgVideoRef.current.play().catch(() => {});
+            }
+            
+            // Play foreground video and catch Low Power Mode block
+            if (videoRef.current) {
+              videoRef.current.defaultMuted = true;
+              videoRef.current.muted = true;
+              
+              const playPromise = videoRef.current.play();
+              if (playPromise !== undefined) {
+                playPromise
+                  .then(() => {
+                    // Autoplay succeeded
+                    setShowPlayOverlay(false);
+                  })
+                  .catch(() => {
+                    // Autoplay blocked by Low Power Mode
+                    setShowPlayOverlay(true); 
+                  });
+              }
+            }
+          } else {
+            // Pause videos when scrolled out of view to save battery
+            if (bgVideoRef.current) bgVideoRef.current.pause();
+            if (videoRef.current) videoRef.current.pause();
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
     }
-    if (videoRef.current) {
-      videoRef.current.play().catch(() => {});
-    }
+
+    return () => {
+      if (containerRef.current) {
+        observer.unobserve(containerRef.current);
+      }
+    };
   }, []);
 
   const handleVideoClick = () => {
@@ -19,6 +63,7 @@ export default function HeroSlide() {
       if (videoRef.current.paused || videoRef.current.ended) {
         videoRef.current.currentTime = 0;
         videoRef.current.play();
+        setShowPlayOverlay(false); // Hide the Low Power Mode overlay on tap
         
         if (bgVideoRef.current) {
           bgVideoRef.current.currentTime = 0;
@@ -72,6 +117,7 @@ export default function HeroSlide() {
 
   return (
     <div 
+      ref={containerRef}
       onClick={handleVideoClick}
       style={{
         height: '100dvh', width: '100%', position: 'relative', overflow: 'hidden',
@@ -87,8 +133,8 @@ export default function HeroSlide() {
         src="/AnimatedIntro.mp4" 
         autoPlay
         muted
+        defaultMuted
         playsInline
-        controls={false}
         style={{
           position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
           objectFit: 'cover', 
@@ -105,8 +151,8 @@ export default function HeroSlide() {
         src="/AnimatedIntro.mp4" 
         autoPlay
         muted
+        defaultMuted
         playsInline
-        controls={false}
         onEnded={handleVideoEnded}
         style={{
           position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
@@ -132,6 +178,29 @@ export default function HeroSlide() {
           {p.emoji}
         </motion.div>
       ))}
+
+      {/* NEW LAYER: Custom Play Overlay for Low Power Mode */}
+      {showPlayOverlay && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          style={{
+            position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.4)', zIndex: 20,
+            display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
+            backdropFilter: 'blur(3px)'
+          }}
+        >
+          <div style={{
+            padding: '15px 30px', border: '1px solid #D4AF37', borderRadius: '30px',
+            backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#fff',
+            fontFamily: '"Great Vibes", cursive', fontSize: '2rem',
+            textShadow: '0px 2px 4px rgba(0,0,0,0.5)'
+          }}>
+            Tap to Play
+          </div>
+        </motion.div>
+      )}
       
       {/* LAYER 4: Text Container */}
       <motion.div 
