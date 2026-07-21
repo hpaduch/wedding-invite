@@ -3,25 +3,6 @@ import { motion } from 'framer-motion';
 export default function FinalSlide() {
   const themeColor = '#4A3728';
 
-  // Universal ICS file generator string
-  const createICSDataURI = () => {
-    const calendarEvent = [
-      'BEGIN:VCALENDAR',
-      'VERSION:2.0',
-      'BEGIN:VEVENT',
-      'URL:' + window.location.href,
-      'DTSTART:20260822T090000Z',  // Aug 22, 2026
-      'DTEND:20260824T180000Z',    // Aug 24, 2026
-      'SUMMARY:' + "Praveena & Hari's Wedding Celebration",
-      'DESCRIPTION:' + "We look forward to celebrating this beautiful new beginning with you!",
-      'LOCATION:' + "Anantapur\\, Andhra Pradesh\\, India",
-      'END:VEVENT',
-      'END:VCALENDAR'
-    ].join('\r\n');
-
-    return `data:text/calendar;charset=utf-8,${encodeURIComponent(calendarEvent)}`;
-  };
-
   const slideStyle = {
     height: '100vh', 
     width: '100%', 
@@ -70,15 +51,10 @@ export default function FinalSlide() {
 
         {/* Event Info Pills */}
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center' }}>
-          {/* Interactive Date Pill for Native Calendars */}
-          <a 
-            href={createICSDataURI()} 
-            download="wedding-invite.ics"
-            style={{ ...pillStyle, cursor: 'pointer', textDecoration: 'none', color: themeColor }}
-            title="Click to add to your calendar app"
-          >
+          {/* Calendar link removed; now a static informational pill */}
+          <span style={pillStyle}>
             📅 August 23
-          </a>
+          </span>
           <span style={pillStyle}>Anantapur</span>
           <span style={pillStyle}>2026</span>
         </div>

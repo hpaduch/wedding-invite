@@ -30,42 +30,6 @@ export default function EventCards() {
     }
   ];
 
-  // 1. Updated: Blob-based ICS generator
-  const downloadICS = (e, event) => {
-    e.preventDefault();
-    const calendarEvent = [
-      'BEGIN:VCALENDAR', 'VERSION:2.0', 'BEGIN:VEVENT',
-      `DTSTART:${event.dateTime}`,
-      `DTEND:${event.dateTime.substring(0, 9)}T220000Z`, 
-      `SUMMARY:${event.name} - Praveena & Hari`,
-      `DESCRIPTION:${event.desc}`,
-      `LOCATION:${event.venue}`,
-      'END:VEVENT', 'END:VCALENDAR'
-    ].join('\r\n');
-
-    const blob = new Blob([calendarEvent], { type: 'text/calendar;charset=utf-8' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    
-    link.href = url;
-    link.setAttribute('download', `${event.name.toLowerCase()}.ics`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
-  };
-
-  // 2. New: Google Calendar Link generator
-  const getGoogleCalendarUrl = (event) => {
-    const gCalUrl = new URL('https://calendar.google.com/calendar/render');
-    gCalUrl.searchParams.append('action', 'TEMPLATE');
-    gCalUrl.searchParams.append('text', `${event.name} - Praveena & Hari`);
-    gCalUrl.searchParams.append('dates', `${event.dateTime}/${event.dateTime.substring(0, 9)}T220000Z`);
-    gCalUrl.searchParams.append('details', event.desc);
-    gCalUrl.searchParams.append('location', event.venue);
-    return gCalUrl.toString();
-  };
-
   return (
     <>
       {events.map((event, index) => (
@@ -90,24 +54,6 @@ export default function EventCards() {
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Calendar size={18} /> <span>{event.date}</span>
-              </div>
-              
-              {/* Added a small container to hold both Apple/Outlook and Google calendar buttons */}
-              <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
-                <button 
-                  onClick={(e) => downloadICS(e, event)} 
-                  style={calendarButtonStyle}
-                >
-                  Apple / Outlook
-                </button>
-                <a 
-                  href={getGoogleCalendarUrl(event)} 
-                  target="_blank" 
-                  rel="noreferrer"
-                  style={calendarButtonStyle}
-                >
-                  Google Calendar
-                </a>
               </div>
             </div>
             
@@ -142,19 +88,3 @@ export default function EventCards() {
     </>
   );
 }
-
-const calendarButtonStyle = {
-  backgroundColor: 'rgba(255, 255, 255, 0.15)',
-  color: 'white',
-  textDecoration: 'none',
-  padding: '6px 14px',
-  borderRadius: '15px',
-  fontSize: '0.75rem',
-  border: '1px solid rgba(255, 255, 255, 0.25)',
-  fontWeight: '500',
-  display: 'inline-flex',
-  alignItems: 'center',
-  cursor: 'pointer',
-  transition: 'background 0.2s ease',
-  fontFamily: '"Space Mono", monospace'
-};
