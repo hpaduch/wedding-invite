@@ -68,7 +68,7 @@ export default function RsvpSection() {
     setIsSubmitted(true);
     setIsSubmitting(false);
 
-    const contactNumber = side === 'Praveena' ? '919440983695' : '917893959094';
+    const contactNumber = side === 'Praveena' ? '919502683695' : '917893959094';
     window.location.href = `https://wa.me/${contactNumber}?text=${encodeURIComponent(text)}`;
   };
 

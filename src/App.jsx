@@ -177,7 +177,7 @@ function App() {
         <FamilySlide />
         <EventCards />
         <CountdownSection />
-        <RSVPSlide />
+        {/* <RSVPSlide /> */}
         <FinalSlide />
       </div>
     </>
