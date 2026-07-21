@@ -42,7 +42,7 @@ export default function EnvelopeIntro({ onComplete, onInteract }) {
       }}
     >
       <motion.img 
-        src="/envelope-rk.png" 
+        src="/PH.jpeg" 
         alt="Tap to open"
         style={{ 
           width: '230px', 

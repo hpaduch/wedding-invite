@@ -21,44 +21,56 @@ export default function FinalSlide() {
     padding: '0 20px'
   };
 
+  const textAnimation = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+  };
+
   return (
     <div style={slideStyle}>
-      <div style={{ zIndex: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', maxWidth: '340px' }}>
+      <motion.div 
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: false, amount: 0.3 }}
+        transition={{ staggerChildren: 0.2 }}
+        style={{ zIndex: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', maxWidth: '340px' }}
+      >
         
         {/* Names Stacked Vertically with Heart */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '5px', marginBottom: '25px', width: '100%' }}>
-          <span style={{ fontFamily: 'Great Vibes, cursive', fontSize: '4.2rem', fontWeight: 'normal', lineHeight: '1' }}>
+          <motion.span variants={textAnimation} style={{ fontFamily: 'Great Vibes, cursive', fontSize: '4.2rem', fontWeight: 'normal', lineHeight: '1' }}>
             Praveena
-          </span>
+          </motion.span>
           
-          <motion.div
-            animate={{ scale: [1, 1.18, 1] }}
-            transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-            style={{ color: '#E31C25', fontSize: '2.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 0' }}
-          >
-            ♥
+          <motion.div variants={textAnimation}>
+            <motion.div
+              animate={{ scale: [1, 1.18, 1] }}
+              transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+              style={{ color: '#E31C25', fontSize: '2.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 0' }}
+            >
+              ♥
+            </motion.div>
           </motion.div>
           
-          <span style={{ fontFamily: 'Great Vibes, cursive', fontSize: '4.2rem', fontWeight: 'normal', lineHeight: '1' }}>
+          <motion.span variants={textAnimation} style={{ fontFamily: 'Great Vibes, cursive', fontSize: '4.2rem', fontWeight: 'normal', lineHeight: '1' }}>
             Hari
-          </span>
+          </motion.span>
         </div>
 
         {/* Invitation Message */}
-        <p style={{ fontStyle: 'italic', fontSize: '1.1rem', lineHeight: '1.6', margin: '10px 0 30px 0', padding: '0 5px' }}>
+        <motion.p variants={textAnimation} style={{ fontStyle: 'italic', fontSize: '1.1rem', lineHeight: '1.6', margin: '10px 0 30px 0', padding: '0 5px' }}>
           "Your love, presence, and blessings mean the world to us. We look forward to celebrating this beautiful new beginning with you!"
-        </p>
+        </motion.p>
 
         {/* Event Info Pills */}
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center' }}>
-          {/* Calendar link removed; now a static informational pill */}
+        <motion.div variants={textAnimation} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center' }}>
           <span style={pillStyle}>
-            📅 August 23
+             August 23
           </span>
           <span style={pillStyle}>Anantapur</span>
           <span style={pillStyle}>2026</span>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

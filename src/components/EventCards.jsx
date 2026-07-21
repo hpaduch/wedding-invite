@@ -1,4 +1,5 @@
 import { Calendar, MapPin, Clock } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function EventCards() {
   const events = [
@@ -30,10 +31,54 @@ export default function EventCards() {
     }
   ];
 
+  // Standardized text animation
+  const textAnimation = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+  };
+
+  // Reusable delayed arrow for the event slides (White for dark backgrounds)
+  const ScrollArrow = () => (
+    <motion.div
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: false }}
+      transition={{ delay: 5, duration: 1 }}
+      style={{
+        position: 'absolute',
+        bottom: '40px',
+        display: 'flex',
+        justifyContent: 'center',
+        pointerEvents: 'none',
+        zIndex: 10
+      }}
+    >
+      <motion.div
+        animate={{ y: [0, -15, 0] }}
+        transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+      >
+        <svg 
+          width="32" 
+          height="32" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="rgba(255, 255, 255, 0.9)" 
+          strokeWidth="2.5" 
+          strokeLinecap="round" 
+          strokeLinejoin="round"
+          style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.6))' }}
+        >
+          <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+      </motion.div>
+    </motion.div>
+  );
+
   return (
     <>
       {events.map((event, index) => (
         <div key={index} style={{
+          position: 'relative', // NEW: Required to anchor the absolute animated arrow
           height: '100vh', width: '100%', scrollSnapAlign: 'start',
           backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.6)), url(${event.bgImage})`,
           backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center',
@@ -41,48 +86,59 @@ export default function EventCards() {
           color: 'white', textAlign: 'center', padding: '0 20px', boxSizing: 'border-box'
         }}>
           
-          <p style={{ color: event.nameColor, fontSize: '2.5rem', marginBottom: '5px', fontFamily: event.calligraphyFont }}>
-            {event.label}
-          </p>
-          
-          <h1 style={{ fontFamily: '"Cormorant Garamond", serif', fontWeight: '700', fontSize: '3.5rem', margin: '0 0 15px 0' }}>
-            {event.name}
-          </h1>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', alignItems: 'center', marginBottom: '25px', fontFamily: '"Space Mono", monospace', fontSize: '0.9rem' }}>
+          <motion.div 
+            initial="hidden" 
+            whileInView="visible" 
+            viewport={{ once: false, amount: 0.3 }}
+            transition={{ staggerChildren: 0.2 }}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}
+          >
+            <motion.p variants={textAnimation} style={{ color: event.nameColor, fontSize: '2.5rem', marginBottom: '5px', fontFamily: event.calligraphyFont }}>
+              {event.label}
+            </motion.p>
             
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Calendar size={18} /> <span>{event.date}</span>
+            <motion.h1 variants={textAnimation} style={{ fontFamily: '"Cormorant Garamond", serif', fontWeight: '700', fontSize: '3.5rem', margin: '0 0 15px 0' }}>
+              {event.name}
+            </motion.h1>
+            
+            <motion.div variants={textAnimation} style={{ display: 'flex', flexDirection: 'column', gap: '18px', alignItems: 'center', marginBottom: '25px', fontFamily: '"Space Mono", monospace', fontSize: '0.9rem' }}>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Calendar size={18} /> <span>{event.date}</span>
+                </div>
               </div>
-            </div>
-            
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Clock size={18} /> <span>{event.time}</span>
-            </div>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+              
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <MapPin size={18} /> <span>{event.venue}</span>
+                <Clock size={18} /> <span>{event.time}</span>
               </div>
-              <a 
-                href={event.mapsUrl} 
-                target="_blank" 
-                rel="noreferrer" 
-                style={{
-                  backgroundColor: event.nameColor, color: '#000', textDecoration: 'none',
-                  padding: '8px 18px', borderRadius: '20px', fontWeight: 'bold', 
-                  display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', marginTop: '4px'
-                }}
-              >
-                <MapPin size={14} /> Open in Maps
-              </a>
-            </div>
-          </div>
-          
-          <p style={{ maxWidth: '85%', lineHeight: '1.6', margin: '5px 0 0 0', fontFamily: '"Cormorant Garamond", serif', fontStyle: 'italic', fontSize: '1.2rem' }}>
-            {event.desc}
-          </p>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <MapPin size={18} /> <span>{event.venue}</span>
+                </div>
+                <a 
+                  href={event.mapsUrl} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  style={{
+                    backgroundColor: event.nameColor, color: '#000', textDecoration: 'none',
+                    padding: '8px 18px', borderRadius: '20px', fontWeight: 'bold', 
+                    display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', marginTop: '4px'
+                  }}
+                >
+                  <MapPin size={14} /> Open in Maps
+                </a>
+              </div>
+            </motion.div>
+            
+            <motion.p variants={textAnimation} style={{ maxWidth: '85%', lineHeight: '1.6', margin: '5px 0 0 0', fontFamily: '"Cormorant Garamond", serif', fontStyle: 'italic', fontSize: '1.2rem' }}>
+              {event.desc}
+            </motion.p>
+          </motion.div>
+
+          {/* Mounts the arrow on both event slides */}
+          <ScrollArrow />
         </div>
       ))}
     </>

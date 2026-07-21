@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 
 // Importing all the components
 import EnvelopeIntro from './components/EnvelopeIntro';
@@ -33,15 +34,16 @@ function App() {
     innerAudio.play().catch(() => {});
   }, [inviteOpen]);
 
-  // FIX: Listen for user switching tabs or minimizing browser
+  // FIX: Fortified background audio handling using blur, focus, and pagehide
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        // Pause whatever song is currently active
-        if (sealAudio) sealAudio.pause();
-        if (innerAudio) innerAudio.pause();
-      } else {
-        // Resume the correct song based on invitation status
+    const pauseAllAudio = () => {
+      if (sealAudio) sealAudio.pause();
+      if (innerAudio) innerAudio.pause();
+    };
+
+    const resumeAppropriateAudio = () => {
+      // Double check that the document isn't still hidden before playing
+      if (!document.hidden) {
         if (!inviteOpen && sealAudio) {
           sealAudio.play().catch(() => {});
         } else if (inviteOpen && innerAudio) {
@@ -50,9 +52,27 @@ function App() {
       }
     };
 
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        pauseAllAudio();
+      } else {
+        resumeAppropriateAudio();
+      }
+    };
+
+    // Standard visibility listener
     document.addEventListener("visibilitychange", handleVisibilityChange);
+    
+    // Aggressive fallback listeners for mobile Chrome and Safari
+    window.addEventListener("blur", pauseAllAudio); 
+    window.addEventListener("pagehide", pauseAllAudio);
+    window.addEventListener("focus", resumeAppropriateAudio);
+
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("blur", pauseAllAudio);
+      window.removeEventListener("pagehide", pauseAllAudio);
+      window.removeEventListener("focus", resumeAppropriateAudio);
     };
   }, [inviteOpen]);
 
@@ -96,6 +116,7 @@ function App() {
         <div 
           onClick={handleVideoClick}
           style={{
+            position: 'relative', 
             height: '100vh',
             width: '100%',
             scrollSnapAlign: 'start',
@@ -114,12 +135,42 @@ function App() {
             muted
             playsInline
             onEnded={handleVideoEnded}
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover'
-            }}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
+          
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: false }}
+            transition={{ delay: 5, duration: 1 }} 
+            style={{
+              position: 'absolute',
+              bottom: '40px',
+              display: 'flex',
+              justifyContent: 'center',
+              pointerEvents: 'none',
+              zIndex: 10
+            }}
+          >
+            <motion.div
+              animate={{ y: [0, -15, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+            >
+              <svg 
+                width="32" 
+                height="32" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="rgba(255, 255, 255, 0.9)" 
+                strokeWidth="2.5" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+                style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.6))' }}
+              >
+                <polyline points="18 15 12 9 6 15"></polyline>
+              </svg>
+            </motion.div>
+          </motion.div>
         </div>
 
         <HeroSlide />

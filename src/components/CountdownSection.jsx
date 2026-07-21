@@ -1,26 +1,9 @@
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 export default function CountdownSection() {
   const themeColor = '#4A3728';
 
-  const createICSDataURI = () => {
-    const calendarEvent = [
-      'BEGIN:VCALENDAR',
-      'VERSION:2.0',
-      'BEGIN:VEVENT',
-      'URL:' + window.location.href,
-      'DTSTART:20260822T090000Z',
-      'DTEND:20260824T180000Z',
-      'SUMMARY:' + "Praveena & Hari's Wedding Celebration",
-      'DESCRIPTION:' + "We look forward to celebrating this beautiful new beginning with you!",
-      'LOCATION:' + "Anantapur\\, Andhra Pradesh\\, India",
-      'END:VEVENT',
-      'END:VCALENDAR'
-    ].join('\r\n');
-
-    return `data:text/calendar;charset=utf-8,${encodeURIComponent(calendarEvent)}`;
-  };
-  
   const calculateDaysLeft = () => {
     const weddingDate = new Date('2026-08-23T00:00:00');
     const today = new Date();
@@ -41,6 +24,7 @@ export default function CountdownSection() {
   }, []);
 
   const slideStyle = {
+    position: 'relative', 
     height: '100vh',              
     minHeight: '100vh',
     width: '100%',
@@ -59,36 +43,85 @@ export default function CountdownSection() {
     overflow: 'hidden'            
   };
 
+  const textAnimation = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+  };
+
+  const ScrollArrow = () => (
+    <motion.div
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: false }}
+      transition={{ delay: 1.5, duration: 1 }}
+      style={{
+        position: 'absolute',
+        bottom: '40px',
+        display: 'flex',
+        justifyContent: 'center',
+        pointerEvents: 'none',
+        zIndex: 10
+      }}
+    >
+      <motion.div
+        animate={{ y: [0, -15, 0] }}
+        transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+      >
+        <svg 
+          width="32" 
+          height="32" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="#4A3728" 
+          strokeWidth="2.5" 
+          strokeLinecap="round" 
+          strokeLinejoin="round"
+        >
+          <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+      </motion.div>
+    </motion.div>
+  );
+
   return (
     <div style={slideStyle}>
-      <div style={{ maxWidth: '350px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        
-        <p style={{ fontStyle: 'italic', margin: '0 0 2px 0', fontSize: '1.05rem' }}>
+      <motion.div 
+        initial="hidden" 
+        whileInView="visible" 
+        viewport={{ once: false, amount: 0.3 }}
+        transition={{ staggerChildren: 0.2 }}
+        style={{ maxWidth: '350px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+      >
+        <motion.p variants={textAnimation} style={{ fontStyle: 'italic', margin: '0 0 2px 0', fontSize: '1.05rem' }}>
           The countdown begins...
-        </p>
+        </motion.p>
         
-        <h1 style={{ fontSize: '4.5rem', margin: '0', fontWeight: 'bold', lineHeight: '1' }}>
+        <motion.h1 variants={textAnimation} style={{ fontSize: '4.5rem', margin: '0', fontWeight: 'bold', lineHeight: '1' }}>
           {daysToGo}
-        </h1>
+        </motion.h1>
         
-        <p style={{ fontSize: '1.2rem', fontWeight: '600', letterSpacing: '2px', margin: '2px 0 0 0' }}>
+        <motion.p variants={textAnimation} style={{ fontSize: '1.2rem', fontWeight: '600', letterSpacing: '2px', margin: '2px 0 0 0' }}>
           DAYS TO GO
-        </p>
+        </motion.p>
         
-        <p style={{ fontFamily: 'Great Vibes, cursive', fontSize: '2.3rem', margin: '2px 0 10px 0' }}>
+        <motion.p variants={textAnimation} style={{ fontFamily: 'Great Vibes, cursive', fontSize: '2.3rem', margin: '2px 0 10px 0' }}>
           For the Big Day!
-        </p>
+        </motion.p>
 
-        {/* Universal Download target for device calendar integration */}
-        <a href={createICSDataURI()} download="wedding-invite.ics" style={{ display: 'block', width: '100%', cursor: 'pointer' }}>
+        {/* 
+          FIX: Removed the 'motion.div' animation wrapper from this element.
+          By rendering it statically, the browser never loses the multiply effect! 
+        */}
+        <div style={{ display: 'block', width: '100%', marginTop: '10px' }}>
           <img 
             src="/calendar.jpg" 
-            alt="August Calendar - Click to add to your calendar app" 
+            alt="August Calendar" 
             style={calendarImageStyle} 
           />
-        </a>
-        
-      </div>
+        </div>
+      </motion.div>
+
+      <ScrollArrow />
     </div>
   );
 }
@@ -98,6 +131,5 @@ const calendarImageStyle = {
   maxWidth: '260px', 
   height: 'auto',
   objectFit: 'contain',
-  marginTop: '5px',
   mixBlendMode: 'multiply'
 };
