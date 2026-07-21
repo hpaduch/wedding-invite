@@ -7,7 +7,7 @@ export default function AdminDashboard() {
   const [rsvps, setRsvps] = useState([]); //[cite: 4]
   const [loading, setLoading] = useState(false); //[cite: 4]
 
-  const ADMIN_PASSWORD = "OurWedding2026"; //[cite: 4]
+  const ADMIN_PASSWORD = "Letmein$123"; //[cite: 4]
 
   const handleLogin = (e) => { //[cite: 4]
     e.preventDefault(); //[cite: 4]
