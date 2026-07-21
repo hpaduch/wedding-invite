@@ -16,7 +16,7 @@ export default function AdminDashboard() {
   const [filterTeam, setFilterTeam] = useState('all'); // 'all', 'praveena', 'hari'
   const [sortBy, setSortBy] = useState('newest'); // 'newest', 'oldest', 'name', 'guests'
 
-  const ADMIN_PASSWORD = "OurWedding2026";
+  const ADMIN_PASSWORD = "Letmein$123";
   const teamPraveenaColor = '#F06292'; 
   const teamHariColor = '#60A5FA';
 
