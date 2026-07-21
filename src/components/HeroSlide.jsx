@@ -5,7 +5,6 @@ export default function HeroSlide() {
   const videoRef = useRef(null);
   const bgVideoRef = useRef(null); 
 
-  // NEW: Forcefully autoplay both videos silently to bypass mobile restrictions
   useEffect(() => {
     if (bgVideoRef.current) {
       bgVideoRef.current.play().catch(() => {});
@@ -90,14 +89,13 @@ export default function HeroSlide() {
         muted
         playsInline
         controls={false}
-        disablePictureInPicture
         style={{
           position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
           objectFit: 'cover', 
           filter: 'blur(35px) brightness(0.8)', 
           transform: 'scale(1.2)', 
           zIndex: 0,
-          pointerEvents: 'none' // NEW: Prevents browser from intercepting taps
+          pointerEvents: 'none' 
         }}
       />
 
@@ -109,13 +107,12 @@ export default function HeroSlide() {
         muted
         playsInline
         controls={false}
-        disablePictureInPicture
         onEnded={handleVideoEnded}
         style={{
           position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
           objectFit: 'contain', 
           zIndex: 1,
-          pointerEvents: 'none' // NEW: Prevents browser from intercepting taps
+          pointerEvents: 'none'
         }}
       />
       

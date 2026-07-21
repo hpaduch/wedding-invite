@@ -9,11 +9,8 @@ export default function EnvelopeIntro({ onComplete, onInteract }) {
   const bgVideoRef = useRef(null);
 
   useEffect(() => {
-    // 1. Double-force the mute state directly on the DOM element 
-    // to guarantee iOS doesn't block it and show the play button
+    // Clean trigger matching App.jsx logic
     if (bgVideoRef.current) {
-      bgVideoRef.current.defaultMuted = true;
-      bgVideoRef.current.muted = true;
       bgVideoRef.current.play().catch(() => {});
     }
     
@@ -75,12 +72,9 @@ export default function EnvelopeIntro({ onComplete, onInteract }) {
         src="/IntroBackground.mp4"
         autoPlay
         loop
-        muted // Standard React mute
-        defaultMuted // 2. FORCES the mute attribute into the HTML for iOS
-        playsInline // Standard inline play
-        webkit-playsinline="true" // 3. Older iOS fallback to prevent full-screen/play buttons
+        muted
+        playsInline
         controls={false} 
-        disablePictureInPicture
         style={{
           position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
           objectFit: 'cover', zIndex: 0,
