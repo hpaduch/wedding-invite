@@ -25,7 +25,7 @@ export default function EventCards() {
       time: "10:30 AM",
       venue: "Dwaraka Convention Hall",    
       desc: "Witness our sacred union as we perform the traditional rituals, pledging our lives to each other amidst the holy chants of the Muhurtham.",
-      mapsUrl: "https://maps.app.goo.gl/your-link",
+      mapsUrl: "https://maps.app.goo.gl/99SjYxw4eeyYBCtn6",
       calligraphyFont: '"Great Vibes", cursive',
       bgImage: "/wedding-bg.jpg"
     }

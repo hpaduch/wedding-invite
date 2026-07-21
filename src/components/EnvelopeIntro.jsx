@@ -21,7 +21,7 @@ export default function EnvelopeIntro({ onComplete, onInteract }) {
     setBurst(true); 
     onInteract?.(); 
     
-    // Give the confetti blast a tiny bit more time to shine before sliding up
+    // Give the confetti blast time to shine before sliding up
     setTimeout(() => {
       setOpened(true);
     }, 600);
@@ -32,7 +32,7 @@ export default function EnvelopeIntro({ onComplete, onInteract }) {
     }, 1400);
   };
 
-  // 1. Reverted to the softer, elegant gold dust
+  // Ambient Gold Dust (Soft & Elegant)
   const ambientDust = Array.from({ length: 40 }).map((_, i) => ({
     id: i,
     left: `${Math.random() * 100}%`,
@@ -42,18 +42,18 @@ export default function EnvelopeIntro({ onComplete, onInteract }) {
     duration: Math.random() * 3 + 3 
   }));
 
-  // 2. Created a "Blast of Love" confetti generator
+  // "Blast of Love" confetti generator
   const confettiEmojis = ['❤️', '🤍', '💕', '💖', '✨'];
   const burstParticles = Array.from({ length: 35 }).map((_, i) => {
-    const angle = (Math.random() * 360) * (Math.PI / 180); // Explode in full 360 circle
-    const distance = Math.random() * 150 + 50; // Travel random distances
+    const angle = (Math.random() * 360) * (Math.PI / 180); 
+    const distance = Math.random() * 150 + 50; 
     return {
       id: i,
       emoji: confettiEmojis[Math.floor(Math.random() * confettiEmojis.length)],
       x: Math.cos(angle) * distance, 
       y: Math.sin(angle) * distance,
-      rotation: Math.random() * 360, // Spin randomly
-      size: Math.random() * 1 + 0.8 // Random sizes between 0.8rem and 1.8rem
+      rotation: Math.random() * 360, 
+      size: Math.random() * 1 + 0.8 
     };
   });
 
@@ -62,17 +62,14 @@ export default function EnvelopeIntro({ onComplete, onInteract }) {
       onClick={handleOpen}
       initial={{ y: 0 }}
       animate={{ 
-        y: opened ? '-100dvh' : 0, 
-        backgroundPosition: ['0% 50%', '100% 50%', '0% 50%']
+        y: opened ? '-100dvh' : 0
       }}
       transition={{ 
-        y: { duration: 0.8, ease: [0.76, 0, 0.24, 1] }, 
-        backgroundPosition: { repeat: Infinity, duration: 15, ease: "linear" }
+        y: { duration: 0.8, ease: [0.76, 0, 0.24, 1] }
       }}
       style={{
         position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-        background: 'linear-gradient(45deg, #e3d3c0, #efe8df, #d4c1aa, #e3d3c0)',
-        backgroundSize: '400% 400%', 
+        backgroundColor: '#000', // Black base so the video pops
         display: 'flex', 
         flexDirection: 'column', 
         justifyContent: 'center', 
@@ -83,13 +80,46 @@ export default function EnvelopeIntro({ onComplete, onInteract }) {
         overflow: 'hidden' 
       }}
     >
-      {/* Ambient Gold Dust Layer (Soft & Elegant) */}
+      {/* 1. The New Background Video */}
+      <video 
+        src="/IntroBackground.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        style={{
+          position: 'absolute',
+          top: 0, left: 0, width: '100%', height: '100%',
+          objectFit: 'cover',
+          zIndex: 0
+        }}
+      />
+
+      {/* 2. The Luxury Shimmer Overlay (Semi-transparent to let the video show through) */}
+      <motion.div
+        animate={{ 
+          backgroundPosition: ['0% 50%', '100% 50%', '0% 50%']
+        }}
+        transition={{ 
+          backgroundPosition: { repeat: Infinity, duration: 15, ease: "linear" }
+        }}
+        style={{
+          position: 'absolute',
+          top: 0, left: 0, width: '100%', height: '100%',
+          background: 'linear-gradient(45deg, rgba(227, 211, 192, 0.65), rgba(239, 232, 223, 0.65), rgba(212, 193, 170, 0.65), rgba(227, 211, 192, 0.65))',
+          backgroundSize: '400% 400%',
+          zIndex: 1,
+          pointerEvents: 'none'
+        }}
+      />
+
+      {/* 3. Ambient Gold Dust Layer */}
       {ambientDust.map((p) => (
         <motion.div
           key={p.id}
           animate={{ 
             y: [0, -80], 
-            opacity: [0, 0.7, 0], // Reverted to soft opacity
+            opacity: [0, 0.7, 0], 
             scale: [1, 1.5, 1]
           }}
           transition={{
@@ -104,15 +134,16 @@ export default function EnvelopeIntro({ onComplete, onInteract }) {
             top: p.top,
             width: p.size,
             height: p.size,
-            backgroundColor: '#D4AF37', // Reverted to elegant gold
+            backgroundColor: '#D4AF37', 
             borderRadius: '50%',
-            boxShadow: '0 0 8px rgba(212, 175, 55, 0.5)', // Reverted to soft shadow
-            pointerEvents: 'none' 
+            boxShadow: '0 0 8px rgba(212, 175, 55, 0.5)', 
+            pointerEvents: 'none',
+            zIndex: 2
           }}
         />
       ))}
 
-      {/* Love Confetti Blast Layer */}
+      {/* 4. Love Confetti Blast Layer */}
       <AnimatePresence>
         {burst && (
           <div style={{ position: 'absolute', top: '50%', left: '50%', zIndex: 60, pointerEvents: 'none' }}>
@@ -145,6 +176,7 @@ export default function EnvelopeIntro({ onComplete, onInteract }) {
         )}
       </AnimatePresence>
 
+      {/* 5. Logo and Interactive Elements */}
       <motion.img 
         src="/PH.jpeg" 
         alt="Tap to open"
@@ -153,7 +185,8 @@ export default function EnvelopeIntro({ onComplete, onInteract }) {
           cursor: 'pointer',
           mixBlendMode: 'multiply', 
           borderRadius: '50%', 
-          zIndex: 10
+          zIndex: 10,
+          backgroundColor: '#f5ece0' // Backup color to ensure multiply blend works well over the video
         }} 
         animate={{ 
           y: burst ? 0 : [0, -8, 0],
@@ -166,16 +199,18 @@ export default function EnvelopeIntro({ onComplete, onInteract }) {
       />
       
       <motion.p
-        animate={{ opacity: burst ? 0 : [0.4, 1, 0.4] }} 
+        animate={{ opacity: burst ? 0 : [0.6, 1, 0.6] }} 
         transition={{ repeat: burst ? 0 : Infinity, duration: 2, ease: "easeInOut" }}
         style={{
           fontFamily: 'Cormorant, serif',
           fontSize: '1.2rem',
           letterSpacing: '3px',
-          color: '#555',
+          color: '#333',
+          fontWeight: 'bold', // Made slightly bolder to read clearly over the video
           margin: 0,
           cursor: 'pointer',
-          zIndex: 10
+          zIndex: 10,
+          textShadow: '0 2px 4px rgba(255,255,255,0.6)' // Soft text shadow for readability
         }}
       >
         TAP TO OPEN
