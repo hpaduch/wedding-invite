@@ -16,7 +16,10 @@ let innerAudio = null;
 
 function App() {
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [hasAutoScrolled, setHasAutoScrolled] = useState(false); // NEW: Track auto-scroll
+  
   const videoRef = useRef(null);
+  const introSlideRef = useRef(null); // NEW: Reference to the slide container
 
   useEffect(() => {
     if (inviteOpen) return;
@@ -32,9 +35,13 @@ function App() {
     innerAudio = new Audio("/song-inner.mp3");
     innerAudio.loop = true;
     innerAudio.play().catch(() => {});
+    
+    // NEW: Force play the intro video the moment the envelope opens
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {});
+    }
   }, [inviteOpen]);
 
-  // FIX: Fortified background audio handling using blur, focus, and pagehide
   useEffect(() => {
     const pauseAllAudio = () => {
       if (sealAudio) sealAudio.pause();
@@ -42,7 +49,6 @@ function App() {
     };
 
     const resumeAppropriateAudio = () => {
-      // Double check that the document isn't still hidden before playing
       if (!document.hidden) {
         if (!inviteOpen && sealAudio) {
           sealAudio.play().catch(() => {});
@@ -60,10 +66,7 @@ function App() {
       }
     };
 
-    // Standard visibility listener
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    
-    // Aggressive fallback listeners for mobile Chrome and Safari
     window.addEventListener("blur", pauseAllAudio); 
     window.addEventListener("pagehide", pauseAllAudio);
     window.addEventListener("focus", resumeAppropriateAudio);
@@ -88,6 +91,13 @@ function App() {
   const handleVideoEnded = () => {
     if (videoRef.current) {
       videoRef.current.currentTime = 0;
+      videoRef.current.play(); // Keeps playing in the background
+    }
+    
+    // NEW: Auto-scroll to the next slide only once
+    if (!hasAutoScrolled && introSlideRef.current && introSlideRef.current.nextElementSibling) {
+      setHasAutoScrolled(true);
+      introSlideRef.current.nextElementSibling.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -105,27 +115,19 @@ function App() {
       <div
         className="main-snap-container"
         style={{
-          position: "fixed",
-          top: 0, left: 0, right: 0, bottom: 0,
-          maxWidth: "430px",
-          margin: "0 auto",
-          overflowY: "scroll",
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          maxWidth: "430px", margin: "0 auto", overflowY: "scroll",
           scrollSnapType: "y mandatory",
         }}
       >
         <div 
+          ref={introSlideRef} // NEW: Attached reference here
           onClick={handleVideoClick}
           style={{
-            position: 'relative', 
-            height: '100vh',
-            width: '100%',
-            scrollSnapAlign: 'start',
-            backgroundColor: '#000',
-            overflow: 'hidden',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            cursor: 'pointer'
+            position: 'relative', height: '100dvh', width: '100%',
+            scrollSnapAlign: 'start', backgroundColor: '#000',
+            overflow: 'hidden', display: 'flex', justifyContent: 'center',
+            alignItems: 'center', cursor: 'pointer'
           }}
         >
           <video
@@ -134,8 +136,12 @@ function App() {
             autoPlay
             muted
             playsInline
+            controls={false}
             onEnded={handleVideoEnded}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            style={{ 
+              width: '100%', height: '100%', objectFit: 'cover',
+              pointerEvents: 'none' // NEW: Stops iOS from hijacking clicks
+            }}
           />
           
           <motion.div
@@ -144,29 +150,12 @@ function App() {
             viewport={{ once: false }}
             transition={{ delay: 5, duration: 1 }} 
             style={{
-              position: 'absolute',
-              bottom: '40px',
-              display: 'flex',
-              justifyContent: 'center',
-              pointerEvents: 'none',
-              zIndex: 10
+              position: 'absolute', bottom: '40px', display: 'flex',
+              justifyContent: 'center', pointerEvents: 'none', zIndex: 10
             }}
           >
-            <motion.div
-              animate={{ y: [0, -15, 0] }}
-              transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-            >
-              <svg 
-                width="32" 
-                height="32" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="rgba(255, 255, 255, 0.9)" 
-                strokeWidth="2.5" 
-                strokeLinecap="round" 
-                strokeLinejoin="round"
-                style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.6))' }}
-              >
+            <motion.div animate={{ y: [0, -15, 0] }} transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(255, 255, 255, 0.9)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.6))' }}>
                 <polyline points="18 15 12 9 6 15"></polyline>
               </svg>
             </motion.div>
