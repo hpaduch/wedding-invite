@@ -1,9 +1,19 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 export default function HeroSlide() {
   const videoRef = useRef(null);
   const bgVideoRef = useRef(null); 
+
+  // NEW: Forcefully autoplay both videos silently to bypass mobile restrictions
+  useEffect(() => {
+    if (bgVideoRef.current) {
+      bgVideoRef.current.play().catch(() => {});
+    }
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {});
+    }
+  }, []);
 
   const handleVideoClick = () => {
     if (videoRef.current) {
@@ -79,12 +89,15 @@ export default function HeroSlide() {
         autoPlay
         muted
         playsInline
+        controls={false}
+        disablePictureInPicture
         style={{
           position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
           objectFit: 'cover', 
           filter: 'blur(35px) brightness(0.8)', 
           transform: 'scale(1.2)', 
-          zIndex: 0 
+          zIndex: 0,
+          pointerEvents: 'none' // NEW: Prevents browser from intercepting taps
         }}
       />
 
@@ -95,11 +108,14 @@ export default function HeroSlide() {
         autoPlay
         muted
         playsInline
+        controls={false}
+        disablePictureInPicture
         onEnded={handleVideoEnded}
         style={{
           position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
           objectFit: 'contain', 
-          zIndex: 1 
+          zIndex: 1,
+          pointerEvents: 'none' // NEW: Prevents browser from intercepting taps
         }}
       />
       
@@ -134,10 +150,10 @@ export default function HeroSlide() {
           }} 
           style={{ 
             color: '#4A3728', 
-            fontFamily: '"Great Vibes", cursive', // Switched to calligraphy font
-            fontSize: '2.4rem', // Increased size significantly
-            marginBottom: '26dvh', // Slightly adjusted margin for the taller cursive text
-            fontWeight: 'normal', // Removed bold to keep the script elegant
+            fontFamily: '"Great Vibes", cursive', 
+            fontSize: '2.4rem', 
+            marginBottom: '26dvh', 
+            fontWeight: 'normal', 
             textShadow: '0px 0px 8px rgba(255, 255, 255, 0.8)'
           }}
         >

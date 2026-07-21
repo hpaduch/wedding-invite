@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 
-// Importing all the components
 import EnvelopeIntro from './components/EnvelopeIntro';
 import HeroSlide from './components/HeroSlide';
 import RSVPSlide from './components/RSVPSlide';
@@ -11,73 +10,72 @@ import FamilySlide from './components/FamilySlide';
 import CountdownSection from './components/CountdownSection';
 import AdminDashboard from './components/AdminDashboard';
 
-let sealAudio = null;
-let innerAudio = null;
+// A single, continuous background audio instance
+let bgAudio = null;
 
 function App() {
   const [inviteOpen, setInviteOpen] = useState(false);
-  const [hasAutoScrolled, setHasAutoScrolled] = useState(false); // NEW: Track auto-scroll
+  const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
   
   const videoRef = useRef(null);
-  const introSlideRef = useRef(null); // NEW: Reference to the slide container
+  const introSlideRef = useRef(null);
 
+  // Initialize the seamless background music on the very first interaction
   useEffect(() => {
-    if (inviteOpen) return;
-    sealAudio = new Audio("/song-seal.mp3");
-    sealAudio.loop = true;
-    const start = () => sealAudio.play().catch(() => {});
-    document.addEventListener("touchstart", start, { once: true });
-  }, [inviteOpen]);
+    const startAudio = () => {
+      if (!bgAudio) {
+        bgAudio = new Audio("/song-inner.mp3"); // Ensure this matches your desired song file
+        bgAudio.loop = true;
+        bgAudio.play().catch(() => {});
+      }
+    };
 
-  useEffect(() => {
-    if (!inviteOpen) return;
-    if (sealAudio) { sealAudio.pause(); sealAudio = null; }
-    innerAudio = new Audio("/song-inner.mp3");
-    innerAudio.loop = true;
-    innerAudio.play().catch(() => {});
+    // Listeners for the very first interaction
+    document.addEventListener("touchstart", startAudio, { once: true });
+    document.addEventListener("click", startAudio, { once: true });
     
-    // NEW: Force play the intro video the moment the envelope opens
-    if (videoRef.current) {
+    return () => {
+      document.removeEventListener("touchstart", startAudio);
+      document.removeEventListener("click", startAudio);
+    };
+  }, []);
+
+  // Force play the intro video the moment the envelope opens
+  useEffect(() => {
+    if (inviteOpen && videoRef.current) {
       videoRef.current.play().catch(() => {});
     }
   }, [inviteOpen]);
 
+  // Robust visibility handling to pause music ONLY if they leave the app/browser
   useEffect(() => {
-    const pauseAllAudio = () => {
-      if (sealAudio) sealAudio.pause();
-      if (innerAudio) innerAudio.pause();
+    const pauseAudio = () => {
+      if (bgAudio) bgAudio.pause();
     };
 
-    const resumeAppropriateAudio = () => {
-      if (!document.hidden) {
-        if (!inviteOpen && sealAudio) {
-          sealAudio.play().catch(() => {});
-        } else if (inviteOpen && innerAudio) {
-          innerAudio.play().catch(() => {});
-        }
+    const resumeAudio = () => {
+      if (!document.hidden && bgAudio) {
+        bgAudio.play().catch(() => {});
       }
     };
 
     const handleVisibilityChange = () => {
-      if (document.hidden) {
-        pauseAllAudio();
-      } else {
-        resumeAppropriateAudio();
-      }
+      if (document.hidden) pauseAudio();
+      else resumeAudio();
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("blur", pauseAllAudio); 
-    window.addEventListener("pagehide", pauseAllAudio);
-    window.addEventListener("focus", resumeAppropriateAudio);
+    window.addEventListener("blur", pauseAudio); 
+    window.addEventListener("pagehide", pauseAudio);
+    window.addEventListener("focus", resumeAudio);
 
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("blur", pauseAllAudio);
-      window.removeEventListener("pagehide", pauseAllAudio);
-      window.removeEventListener("focus", resumeAppropriateAudio);
+      window.removeEventListener("blur", pauseAudio);
+      window.removeEventListener("pagehide", pauseAudio);
+      window.removeEventListener("focus", resumeAudio);
     };
-  }, [inviteOpen]);
+  }, []);
 
   const handleVideoClick = () => {
     if (videoRef.current) {
@@ -91,10 +89,9 @@ function App() {
   const handleVideoEnded = () => {
     if (videoRef.current) {
       videoRef.current.currentTime = 0;
-      videoRef.current.play(); // Keeps playing in the background
+      videoRef.current.play(); 
     }
     
-    // NEW: Auto-scroll to the next slide only once
     if (!hasAutoScrolled && introSlideRef.current && introSlideRef.current.nextElementSibling) {
       setHasAutoScrolled(true);
       introSlideRef.current.nextElementSibling.scrollIntoView({ behavior: 'smooth' });
@@ -110,7 +107,14 @@ function App() {
     <>
       <EnvelopeIntro 
         onComplete={() => setInviteOpen(true)}
-        onInteract={() => {}}
+        onInteract={() => {
+          // Fallback to start audio just in case the document listener missed it
+          if (!bgAudio) {
+            bgAudio = new Audio("/song-inner.mp3");
+            bgAudio.loop = true;
+            bgAudio.play().catch(() => {});
+          }
+        }}
       />
       <div
         className="main-snap-container"
@@ -121,7 +125,7 @@ function App() {
         }}
       >
         <div 
-          ref={introSlideRef} // NEW: Attached reference here
+          ref={introSlideRef} 
           onClick={handleVideoClick}
           style={{
             position: 'relative', height: '100dvh', width: '100%',
@@ -140,7 +144,7 @@ function App() {
             onEnded={handleVideoEnded}
             style={{ 
               width: '100%', height: '100%', objectFit: 'cover',
-              pointerEvents: 'none' // NEW: Stops iOS from hijacking clicks
+              pointerEvents: 'none' 
             }}
           />
           
@@ -166,7 +170,6 @@ function App() {
         <FamilySlide />
         <EventCards />
         <CountdownSection />
-        {/* <RSVPSlide /> */}
         <FinalSlide />
       </div>
     </>

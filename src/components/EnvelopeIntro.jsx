@@ -6,12 +6,14 @@ export default function EnvelopeIntro({ onComplete, onInteract }) {
   const [skip, setSkip] = useState(false);
   const [burst, setBurst] = useState(false);
   
-  // NEW: Ref to forcefully play the background video
   const bgVideoRef = useRef(null);
 
   useEffect(() => {
-    // Force mobile browsers to autoplay the video silently
+    // 1. Double-force the mute state directly on the DOM element 
+    // to guarantee iOS doesn't block it and show the play button
     if (bgVideoRef.current) {
+      bgVideoRef.current.defaultMuted = true;
+      bgVideoRef.current.muted = true;
       bgVideoRef.current.play().catch(() => {});
     }
     
@@ -73,14 +75,16 @@ export default function EnvelopeIntro({ onComplete, onInteract }) {
         src="/IntroBackground.mp4"
         autoPlay
         loop
-        muted
-        playsInline
-        controls={false} // Ensures native controls stay hidden
+        muted // Standard React mute
+        defaultMuted // 2. FORCES the mute attribute into the HTML for iOS
+        playsInline // Standard inline play
+        webkit-playsinline="true" // 3. Older iOS fallback to prevent full-screen/play buttons
+        controls={false} 
         disablePictureInPicture
         style={{
           position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
           objectFit: 'cover', zIndex: 0,
-          pointerEvents: 'none' // Crucial: prevents iOS from intercepting taps to show a play button
+          pointerEvents: 'none' 
         }}
       />
 
