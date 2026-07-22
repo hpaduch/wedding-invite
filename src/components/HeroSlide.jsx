@@ -172,7 +172,7 @@ export default function HeroSlide() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: false, amount: 0.3 }} 
-        style={{ paddingTop: '6dvh', position: 'relative', zIndex: 3, width: '100%' }}
+        style={{ paddingTop: '2dvh', position: 'relative', zIndex: 3, width: '100%' }} // Reduced paddingTop to pull text higher
       >
         <motion.p 
           variants={{
@@ -183,7 +183,7 @@ export default function HeroSlide() {
             color: '#4A3728', 
             fontFamily: '"Great Vibes", cursive', 
             fontSize: '2.4rem', 
-            marginBottom: '26dvh', 
+            marginBottom: '32dvh', // Increased marginBottom to push names further down
             fontWeight: 'normal', 
             textShadow: '0px 0px 8px rgba(255, 255, 255, 0.8)'
           }}
