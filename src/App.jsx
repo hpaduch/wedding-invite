@@ -24,11 +24,11 @@ function App() {
   // Initialize and PRELOAD the audio as soon as the app mounts
   useEffect(() => {
     // 1. Create the audio object and force it to download immediately
-    if (!bgAudio) {
-      bgAudio = new Audio("/song-inner.mp3");
-      bgAudio.loop = true;
+      if (!bgAudio) {
+        bgAudio = new Audio("/song-inner.mp3");
+        bgAudio.loop = true;
       bgAudio.preload = "auto"; // Tells the browser to download this file right now
-    }
+      }
 
     // 2. Play the preloaded audio on the first interaction
     const startAudio = () => {
@@ -108,6 +108,13 @@ function App() {
     }
   };
 
+  // NEW: Detect manual scroll to prevent the video from yanking the user back
+  const handleUserScroll = (e) => {
+    if (!hasAutoScrolled && e.target.scrollTop > 50) {
+      setHasAutoScrolled(true);
+    }
+  };
+
   const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   if (urlParams.get('view') === 'admin') {
     return <AdminDashboard />;
@@ -118,7 +125,6 @@ function App() {
       <EnvelopeIntro 
         onComplete={() => setInviteOpen(true)}
         onInteract={() => {
-          // Just call play on the already-loaded audio
           if (bgAudio) {
             bgAudio.play().catch(() => {});
           }
@@ -127,6 +133,7 @@ function App() {
       <div
         ref={containerRef}
         className="main-snap-container"
+        onScroll={handleUserScroll} // Added the scroll listener here
         style={{
           position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
           maxWidth: "430px", margin: "0 auto", 
