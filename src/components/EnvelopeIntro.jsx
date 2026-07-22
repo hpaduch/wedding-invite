@@ -132,7 +132,7 @@ export default function EnvelopeIntro({ onComplete, onInteract }) {
       {/* Interactive Logo Layer */}
       <motion.img 
         onClick={handleOpen}
-        src="/PH.jpeg" alt="Tap to open"
+        src="/PH2.jpeg" alt="Tap to open"
         style={{ 
           width: '230px', cursor: 'pointer', mixBlendMode: 'multiply', 
           borderRadius: '50%', zIndex: 10, backgroundColor: '#f5ece0' 
