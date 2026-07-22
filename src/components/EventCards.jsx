@@ -12,7 +12,7 @@ export default function EventCards() {
       time: "7:00 PM",
       venue: "Dwaraka Convention Hall",
       desc: "A joyous evening of music, laughter, and heartfelt blessings. We invite you to share in our happiness as we embark on this new chapter of togetherness.",
-      mapsUrl: "https://maps.app.goo.gl/HAnt1zbMPmou4rde6",
+      mapsUrl: "https://www.google.com/maps/place/Dwaraka+Chalama+Reddy+Coventional+Hall",
       calligraphyFont: '"Pinyon Script", cursive',
       bgImage: "/Reception.jpg"
     },
@@ -25,7 +25,7 @@ export default function EventCards() {
       time: "10:30 AM",
       venue: "Dwaraka Convention Hall",    
       desc: "Witness our sacred union as we perform the traditional rituals, pledging our lives to each other amidst the holy chants of the Muhurtham.",
-      mapsUrl: "https://maps.app.goo.gl/HAnt1zbMPmou4rde6",
+      mapsUrl: "https://www.google.com/maps/place/Dwaraka+Chalama+Reddy+Coventional+Hall",
       calligraphyFont: '"Great Vibes", cursive',
       bgImage: "/wedding-bg.jpg"
     }
