@@ -43,7 +43,7 @@ export default function EventCards() {
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: false }}
-      transition={{ delay: 5, duration: 1 }}
+      transition={{ delay: 1.5, duration: 1 }}
       style={{
         position: 'absolute',
         bottom: '40px',

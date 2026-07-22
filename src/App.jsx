@@ -19,14 +19,20 @@ function App() {
   
   const videoRef = useRef(null);
   const introSlideRef = useRef(null);
-  const containerRef = useRef(null); // Reference to control the main scroll container
+  const containerRef = useRef(null);
 
-  // Initialize the seamless background music on the very first interaction
+  // Initialize and PRELOAD the audio as soon as the app mounts
   useEffect(() => {
+    // 1. Create the audio object and force it to download immediately
+    if (!bgAudio) {
+      bgAudio = new Audio("/song-inner.mp3");
+      bgAudio.loop = true;
+      bgAudio.preload = "auto"; // Tells the browser to download this file right now
+    }
+
+    // 2. Play the preloaded audio on the first interaction
     const startAudio = () => {
-      if (!bgAudio) {
-        bgAudio = new Audio("/song-inner.mp3"); 
-        bgAudio.loop = true;
+      if (bgAudio) {
         bgAudio.play().catch(() => {});
       }
     };
@@ -40,15 +46,11 @@ function App() {
     };
   }, []);
 
-  // Handle video reset and scroll enforcement when the envelope opens
   useEffect(() => {
     if (inviteOpen) {
-      // Force scroll to the top to prevent mobile browsers from restoring previous scroll states
       if (containerRef.current) {
         containerRef.current.scrollTo(0, 0);
       }
-      
-      // Restart the intro video exactly as the envelope disappears
       if (videoRef.current) {
         videoRef.current.currentTime = 0; 
         videoRef.current.play().catch(() => {});
@@ -56,7 +58,6 @@ function App() {
     }
   }, [inviteOpen]);
 
-  // Robust visibility handling to pause music ONLY if they leave the app/browser
   useEffect(() => {
     const pauseAudio = () => {
       if (bgAudio) bgAudio.pause();
@@ -101,7 +102,6 @@ function App() {
       videoRef.current.play(); 
     }
     
-    // Auto-scroll protection: ONLY scroll if the envelope has been officially opened
     if (inviteOpen && !hasAutoScrolled && introSlideRef.current && introSlideRef.current.nextElementSibling) {
       setHasAutoScrolled(true);
       introSlideRef.current.nextElementSibling.scrollIntoView({ behavior: 'smooth' });
@@ -118,9 +118,8 @@ function App() {
       <EnvelopeIntro 
         onComplete={() => setInviteOpen(true)}
         onInteract={() => {
-          if (!bgAudio) {
-            bgAudio = new Audio("/song-inner.mp3");
-            bgAudio.loop = true;
+          // Just call play on the already-loaded audio
+          if (bgAudio) {
             bgAudio.play().catch(() => {});
           }
         }}
@@ -131,7 +130,7 @@ function App() {
         style={{
           position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
           maxWidth: "430px", margin: "0 auto", 
-          overflowY: inviteOpen ? "scroll" : "hidden", // COMPLETELY locks scrolling while envelope is closed
+          overflowY: inviteOpen ? "scroll" : "hidden",
           scrollSnapType: "y mandatory",
         }}
       >
