@@ -12,14 +12,12 @@ export default function HeroSlide() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            // Play background video
             if (bgVideoRef.current) {
               bgVideoRef.current.defaultMuted = true;
               bgVideoRef.current.muted = true;
               bgVideoRef.current.play().catch(() => {});
             }
             
-            // Play foreground video and catch Low Power Mode block
             if (videoRef.current) {
               videoRef.current.defaultMuted = true;
               videoRef.current.muted = true;
@@ -28,17 +26,14 @@ export default function HeroSlide() {
               if (playPromise !== undefined) {
                 playPromise
                   .then(() => {
-                    // Autoplay succeeded
                     setShowPlayOverlay(false);
                   })
                   .catch(() => {
-                    // Autoplay blocked by Low Power Mode
                     setShowPlayOverlay(true); 
                   });
               }
             }
           } else {
-            // Pause videos when scrolled out of view to save battery
             if (bgVideoRef.current) bgVideoRef.current.pause();
             if (videoRef.current) videoRef.current.pause();
           }
@@ -63,7 +58,7 @@ export default function HeroSlide() {
       if (videoRef.current.paused || videoRef.current.ended) {
         videoRef.current.currentTime = 0;
         videoRef.current.play();
-        setShowPlayOverlay(false); // Hide the Low Power Mode overlay on tap
+        setShowPlayOverlay(false); 
         
         if (bgVideoRef.current) {
           bgVideoRef.current.currentTime = 0;
@@ -144,7 +139,7 @@ export default function HeroSlide() {
         }}
       />
 
-      {/* NEW LAYER: Custom Play Overlay for Low Power Mode */}
+      {/* Custom Play Overlay for Low Power Mode */}
       {showPlayOverlay && (
         <motion.div 
           initial={{ opacity: 0 }}
@@ -167,30 +162,39 @@ export default function HeroSlide() {
         </motion.div>
       )}
       
-      {/* LAYER 3: Text Container */}
+      {/* LAYER 3: Decoupled Text Container */}
       <motion.div 
         initial="hidden"
         whileInView="visible"
         viewport={{ once: false, amount: 0.3 }} 
-        style={{ paddingTop: '2dvh', position: 'relative', zIndex: 3, width: '100%' }} // Reduced paddingTop to pull text higher
+        style={{ 
+          position: 'relative', zIndex: 3, width: '100%', height: '100%', 
+          display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' 
+        }} 
       >
+        {/* Absolutely positioned at the top */}
         <motion.p 
           variants={{
             hidden: { opacity: 0, y: -20 },
             visible: { opacity: 1, y: 0, transition: { duration: 0.8 } }
           }} 
           style={{ 
+            position: 'absolute',
+            top: '6dvh', // Pinned exactly to the top, safely below the status bar
             color: '#4A3728', 
             fontFamily: '"Great Vibes", cursive', 
             fontSize: '2.4rem', 
-            marginBottom: '32dvh', // Increased marginBottom to push names further down
             fontWeight: 'normal', 
+            margin: 0,
+            width: '100%',
+            textAlign: 'center',
             textShadow: '0px 0px 8px rgba(255, 255, 255, 0.8)'
           }}
         >
           Join us as we begin our forever...
         </motion.p>
         
+        {/* The names remain perfectly locked in the middle */}
         <div style={{ color: '#FFFFFF', textShadow: '1px 2px 5px rgba(0, 0, 0, 0.6)' }}>
           <motion.h1 variants={leftNameAnimation} style={{ fontFamily: '"Great Vibes", cursive', fontSize: 'clamp(60px, 18vw, 90px)', fontWeight: 'bold', margin: 0, lineHeight: 1.1 }}>
             Praveena
