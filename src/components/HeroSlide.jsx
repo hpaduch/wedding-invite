@@ -97,24 +97,6 @@ export default function HeroSlide() {
     visible: { scale: 1, opacity: 1, transition: { type: 'spring', damping: 10, stiffness: 100, delay: 0.6 } }
   };
 
-  const particles = [
-    { top: '10%', left: '10%', emoji: '🤍', size: '1.2rem', delay: 0.1, duration: 2 },
-    { top: '15%', right: '15%', emoji: '❤️', size: '1rem', delay: 0.5, duration: 2.2 },
-    { top: '35%', left: '5%', emoji: '💕', size: '1.5rem', delay: 0.2, duration: 1.8 },
-    { top: '25%', right: '5%', emoji: '🤍', size: '1.3rem', delay: 0.8, duration: 2.5 },
-    { top: '45%', right: '12%', emoji: '💖', size: '0.9rem', delay: 0.3, duration: 2 },
-    { top: '55%', left: '15%', emoji: '🤍', size: '1.4rem', delay: 0.7, duration: 2.3 },
-    { top: '65%', right: '8%', emoji: '💕', size: '1.1rem', delay: 0.4, duration: 1.9 },
-    { top: '75%', left: '10%', emoji: '❤️', size: '1.2rem', delay: 0.9, duration: 2.4 },
-    { top: '80%', right: '20%', emoji: '🤍', size: '1.3rem', delay: 0.1, duration: 2.1 },
-    { top: '20%', left: '25%', emoji: '💖', size: '1rem', delay: 0.6, duration: 2.2 },
-    { top: '85%', left: '30%', emoji: '❤️', size: '1.4rem', delay: 0.5, duration: 1.8 },
-    { top: '30%', right: '25%', emoji: '🤍', size: '1.1rem', delay: 0.2, duration: 2.5 },
-    { top: '50%', left: '25%', emoji: '💕', size: '0.8rem', delay: 0.8, duration: 1.9 },
-    { top: '70%', right: '28%', emoji: '❤️', size: '1.2rem', delay: 0.3, duration: 2.1 },
-    { top: '12%', left: '50%', emoji: '🤍', size: '1.3rem', delay: 0.4, duration: 2.3 },
-  ];
-
   return (
     <div 
       ref={containerRef}
@@ -161,23 +143,6 @@ export default function HeroSlide() {
           pointerEvents: 'none'
         }}
       />
-      
-      {/* LAYER 3: Particles */}
-      {particles.map((p, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, y: 15, scale: 0.8 }}
-          whileInView={{ opacity: [0, 0.8, 0], y: -50, scale: [0.8, 1.2, 0.8] }}
-          viewport={{ once: false }}
-          transition={{ repeat: Infinity, delay: p.delay, duration: p.duration, ease: 'easeInOut' }}
-          style={{ 
-            position: 'absolute', top: p.top, left: p.left, right: p.right, fontSize: p.size, 
-            zIndex: 2, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
-          }}
-        >
-          {p.emoji}
-        </motion.div>
-      ))}
 
       {/* NEW LAYER: Custom Play Overlay for Low Power Mode */}
       {showPlayOverlay && (
@@ -202,7 +167,7 @@ export default function HeroSlide() {
         </motion.div>
       )}
       
-      {/* LAYER 4: Text Container */}
+      {/* LAYER 3: Text Container */}
       <motion.div 
         initial="hidden"
         whileInView="visible"
@@ -241,7 +206,7 @@ export default function HeroSlide() {
         </div>
       </motion.div>
 
-      {/* LAYER 5: Swipe Up Arrow */}
+      {/* LAYER 4: Swipe Up Arrow */}
       <motion.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}

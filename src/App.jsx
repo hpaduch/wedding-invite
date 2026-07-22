@@ -19,18 +19,18 @@ function App() {
   
   const videoRef = useRef(null);
   const introSlideRef = useRef(null);
+  const containerRef = useRef(null); // Reference to control the main scroll container
 
   // Initialize the seamless background music on the very first interaction
   useEffect(() => {
     const startAudio = () => {
       if (!bgAudio) {
-        bgAudio = new Audio("/song-inner.mp3"); // Ensure this matches your desired song file
+        bgAudio = new Audio("/song-inner.mp3"); 
         bgAudio.loop = true;
         bgAudio.play().catch(() => {});
       }
     };
 
-    // Listeners for the very first interaction
     document.addEventListener("touchstart", startAudio, { once: true });
     document.addEventListener("click", startAudio, { once: true });
     
@@ -40,10 +40,19 @@ function App() {
     };
   }, []);
 
-  // Force play the intro video the moment the envelope opens
+  // Handle video reset and scroll enforcement when the envelope opens
   useEffect(() => {
-    if (inviteOpen && videoRef.current) {
-      videoRef.current.play().catch(() => {});
+    if (inviteOpen) {
+      // Force scroll to the top to prevent mobile browsers from restoring previous scroll states
+      if (containerRef.current) {
+        containerRef.current.scrollTo(0, 0);
+      }
+      
+      // Restart the intro video exactly as the envelope disappears
+      if (videoRef.current) {
+        videoRef.current.currentTime = 0; 
+        videoRef.current.play().catch(() => {});
+      }
     }
   }, [inviteOpen]);
 
@@ -92,7 +101,8 @@ function App() {
       videoRef.current.play(); 
     }
     
-    if (!hasAutoScrolled && introSlideRef.current && introSlideRef.current.nextElementSibling) {
+    // Auto-scroll protection: ONLY scroll if the envelope has been officially opened
+    if (inviteOpen && !hasAutoScrolled && introSlideRef.current && introSlideRef.current.nextElementSibling) {
       setHasAutoScrolled(true);
       introSlideRef.current.nextElementSibling.scrollIntoView({ behavior: 'smooth' });
     }
@@ -108,7 +118,6 @@ function App() {
       <EnvelopeIntro 
         onComplete={() => setInviteOpen(true)}
         onInteract={() => {
-          // Fallback to start audio just in case the document listener missed it
           if (!bgAudio) {
             bgAudio = new Audio("/song-inner.mp3");
             bgAudio.loop = true;
@@ -117,10 +126,12 @@ function App() {
         }}
       />
       <div
+        ref={containerRef}
         className="main-snap-container"
         style={{
           position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-          maxWidth: "430px", margin: "0 auto", overflowY: "scroll",
+          maxWidth: "430px", margin: "0 auto", 
+          overflowY: inviteOpen ? "scroll" : "hidden", // COMPLETELY locks scrolling while envelope is closed
           scrollSnapType: "y mandatory",
         }}
       >
@@ -139,7 +150,9 @@ function App() {
             src="/intro.mp4"
             autoPlay
             muted
+            defaultMuted
             playsInline
+            webkit-playsinline="true"
             controls={false}
             onEnded={handleVideoEnded}
             style={{ 
