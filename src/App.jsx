@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 
-// Importing all the components
 import EnvelopeIntro from './components/EnvelopeIntro';
 import HeroSlide from './components/HeroSlide';
 import RSVPSlide from './components/RSVPSlide';
@@ -11,70 +10,82 @@ import FamilySlide from './components/FamilySlide';
 import CountdownSection from './components/CountdownSection';
 import AdminDashboard from './components/AdminDashboard';
 
-let sealAudio = null;
-let innerAudio = null;
+// A single, continuous background audio instance
+let bgAudio = null;
 
 function App() {
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
+  
   const videoRef = useRef(null);
+  const introSlideRef = useRef(null);
+  const containerRef = useRef(null);
 
+  // Initialize and PRELOAD the audio as soon as the app mounts
   useEffect(() => {
-    if (inviteOpen) return;
-    sealAudio = new Audio("/song-seal.mp3");
-    sealAudio.loop = true;
-    const start = () => sealAudio.play().catch(() => {});
-    document.addEventListener("touchstart", start, { once: true });
-  }, [inviteOpen]);
+    // 1. Create the audio object and force it to download immediately
+      if (!bgAudio) {
+        bgAudio = new Audio("/song-inner.mp3");
+        bgAudio.loop = true;
+      bgAudio.preload = "auto"; // Tells the browser to download this file right now
+      }
 
-  useEffect(() => {
-    if (!inviteOpen) return;
-    if (sealAudio) { sealAudio.pause(); sealAudio = null; }
-    innerAudio = new Audio("/song-inner.mp3");
-    innerAudio.loop = true;
-    innerAudio.play().catch(() => {});
-  }, [inviteOpen]);
-
-  // FIX: Fortified background audio handling using blur, focus, and pagehide
-  useEffect(() => {
-    const pauseAllAudio = () => {
-      if (sealAudio) sealAudio.pause();
-      if (innerAudio) innerAudio.pause();
+    // 2. Play the preloaded audio on the first interaction
+    const startAudio = () => {
+      if (bgAudio) {
+        bgAudio.play().catch(() => {});
+      }
     };
 
-    const resumeAppropriateAudio = () => {
-      // Double check that the document isn't still hidden before playing
-      if (!document.hidden) {
-        if (!inviteOpen && sealAudio) {
-          sealAudio.play().catch(() => {});
-        } else if (inviteOpen && innerAudio) {
-          innerAudio.play().catch(() => {});
-        }
+    document.addEventListener("touchstart", startAudio, { once: true });
+    document.addEventListener("click", startAudio, { once: true });
+    
+    return () => {
+      document.removeEventListener("touchstart", startAudio);
+      document.removeEventListener("click", startAudio);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (inviteOpen) {
+      if (containerRef.current) {
+        containerRef.current.scrollTo(0, 0);
+      }
+      if (videoRef.current) {
+        videoRef.current.currentTime = 0; 
+        videoRef.current.play().catch(() => {});
+      }
+    }
+  }, [inviteOpen]);
+
+  useEffect(() => {
+    const pauseAudio = () => {
+      if (bgAudio) bgAudio.pause();
+    };
+
+    const resumeAudio = () => {
+      if (!document.hidden && bgAudio) {
+        bgAudio.play().catch(() => {});
       }
     };
 
     const handleVisibilityChange = () => {
-      if (document.hidden) {
-        pauseAllAudio();
-      } else {
-        resumeAppropriateAudio();
-      }
+      if (document.hidden) pauseAudio();
+      else resumeAudio();
     };
 
-    // Standard visibility listener
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    
-    // Aggressive fallback listeners for mobile Chrome and Safari
-    window.addEventListener("blur", pauseAllAudio); 
-    window.addEventListener("pagehide", pauseAllAudio);
-    window.addEventListener("focus", resumeAppropriateAudio);
+    window.addEventListener("blur", pauseAudio); 
+    window.addEventListener("pagehide", pauseAudio);
+    window.addEventListener("focus", resumeAudio);
 
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("blur", pauseAllAudio);
-      window.removeEventListener("pagehide", pauseAllAudio);
-      window.removeEventListener("focus", resumeAppropriateAudio);
+      window.removeEventListener("blur", pauseAudio);
+      window.removeEventListener("pagehide", pauseAudio);
+      window.removeEventListener("focus", resumeAudio);
     };
-  }, [inviteOpen]);
+  }, []);
 
   const handleVideoClick = () => {
     if (videoRef.current) {
@@ -88,6 +99,19 @@ function App() {
   const handleVideoEnded = () => {
     if (videoRef.current) {
       videoRef.current.currentTime = 0;
+      videoRef.current.play(); 
+    }
+    
+    if (inviteOpen && !hasAutoScrolled && introSlideRef.current && introSlideRef.current.nextElementSibling) {
+      setHasAutoScrolled(true);
+      introSlideRef.current.nextElementSibling.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  // NEW: Detect manual scroll to prevent the video from yanking the user back
+  const handleUserScroll = (e) => {
+    if (!hasAutoScrolled && e.target.scrollTop > 50) {
+      setHasAutoScrolled(true);
     }
   };
 
@@ -100,32 +124,31 @@ function App() {
     <>
       <EnvelopeIntro 
         onComplete={() => setInviteOpen(true)}
-        onInteract={() => {}}
+        onInteract={() => {
+          if (bgAudio) {
+            bgAudio.play().catch(() => {});
+          }
+        }}
       />
       <div
+        ref={containerRef}
         className="main-snap-container"
+        onScroll={handleUserScroll} // Added the scroll listener here
         style={{
-          position: "fixed",
-          top: 0, left: 0, right: 0, bottom: 0,
-          maxWidth: "430px",
-          margin: "0 auto",
-          overflowY: "scroll",
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          maxWidth: "430px", margin: "0 auto", 
+          overflowY: inviteOpen ? "scroll" : "hidden",
           scrollSnapType: "y mandatory",
         }}
       >
         <div 
+          ref={introSlideRef} 
           onClick={handleVideoClick}
           style={{
-            position: 'relative', 
-            height: '100vh',
-            width: '100%',
-            scrollSnapAlign: 'start',
-            backgroundColor: '#000',
-            overflow: 'hidden',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            cursor: 'pointer'
+            position: 'relative', height: '100dvh', width: '100%',
+            scrollSnapAlign: 'start', backgroundColor: '#000',
+            overflow: 'hidden', display: 'flex', justifyContent: 'center',
+            alignItems: 'center', cursor: 'pointer'
           }}
         >
           <video
@@ -133,9 +156,15 @@ function App() {
             src="/intro.mp4"
             autoPlay
             muted
+            defaultMuted
             playsInline
+            webkit-playsinline="true"
+            controls={false}
             onEnded={handleVideoEnded}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            style={{ 
+              width: '100%', height: '100%', objectFit: 'cover',
+              pointerEvents: 'none' 
+            }}
           />
           
           <motion.div
@@ -144,29 +173,12 @@ function App() {
             viewport={{ once: false }}
             transition={{ delay: 5, duration: 1 }} 
             style={{
-              position: 'absolute',
-              bottom: '40px',
-              display: 'flex',
-              justifyContent: 'center',
-              pointerEvents: 'none',
-              zIndex: 10
+              position: 'absolute', bottom: '40px', display: 'flex',
+              justifyContent: 'center', pointerEvents: 'none', zIndex: 10
             }}
           >
-            <motion.div
-              animate={{ y: [0, -15, 0] }}
-              transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-            >
-              <svg 
-                width="32" 
-                height="32" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="rgba(255, 255, 255, 0.9)" 
-                strokeWidth="2.5" 
-                strokeLinecap="round" 
-                strokeLinejoin="round"
-                style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.6))' }}
-              >
+            <motion.div animate={{ y: [0, -15, 0] }} transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(255, 255, 255, 0.9)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.6))' }}>
                 <polyline points="18 15 12 9 6 15"></polyline>
               </svg>
             </motion.div>
@@ -177,7 +189,6 @@ function App() {
         <FamilySlide />
         <EventCards />
         <CountdownSection />
-        <RSVPSlide />
         <FinalSlide />
       </div>
     </>

@@ -1,109 +1,227 @@
-import { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { useRef, useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 
 export default function HeroSlide() {
-  const slideRef = useRef(null);
-  
-  const { scrollYProgress } = useScroll({
-    target: slideRef,
-    offset: ["start start", "end start"]
-  });
-  const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+  const containerRef = useRef(null);
+  const videoRef = useRef(null);
+  const bgVideoRef = useRef(null); 
+  const [showPlayOverlay, setShowPlayOverlay] = useState(false);
 
-  // Standardized animation variants for consistency
-  const textAnimation = {
-    hidden: { opacity: 0, y: 40 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            if (bgVideoRef.current) {
+              bgVideoRef.current.defaultMuted = true;
+              bgVideoRef.current.muted = true;
+              bgVideoRef.current.play().catch(() => {});
+            }
+            
+            if (videoRef.current) {
+              videoRef.current.defaultMuted = true;
+              videoRef.current.muted = true;
+              
+              const playPromise = videoRef.current.play();
+              if (playPromise !== undefined) {
+                playPromise
+                  .then(() => {
+                    setShowPlayOverlay(false);
+                  })
+                  .catch(() => {
+                    setShowPlayOverlay(true); 
+                  });
+              }
+            }
+          } else {
+            if (bgVideoRef.current) bgVideoRef.current.pause();
+            if (videoRef.current) videoRef.current.pause();
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      if (containerRef.current) {
+        observer.unobserve(containerRef.current);
+      }
+    };
+  }, []);
+
+  const handleVideoClick = () => {
+    if (videoRef.current) {
+      if (videoRef.current.paused || videoRef.current.ended) {
+        videoRef.current.currentTime = 0;
+        videoRef.current.play();
+        setShowPlayOverlay(false); 
+        
+        if (bgVideoRef.current) {
+          bgVideoRef.current.currentTime = 0;
+          bgVideoRef.current.play();
+        }
+      }        
+    }
+  };
+
+  const handleVideoEnded = () => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+    }
+    if (bgVideoRef.current) {
+      bgVideoRef.current.currentTime = 0;
+    }
+  };
+
+  const leftNameAnimation = {
+    hidden: { opacity: 0, x: -60, rotate: -5 },
+    visible: { opacity: 1, x: 0, rotate: 0, transition: { type: 'spring', damping: 14, stiffness: 90, delay: 0.2 } }
+  };
+
+  const rightNameAnimation = {
+    hidden: { opacity: 0, x: 60, rotate: 5 },
+    visible: { opacity: 1, x: 0, rotate: 0, transition: { type: 'spring', damping: 14, stiffness: 90, delay: 0.4 } }
+  };
+
+  const heartAnimation = {
+    hidden: { scale: 0, opacity: 0 },
+    visible: { scale: 1, opacity: 1, transition: { type: 'spring', damping: 10, stiffness: 100, delay: 0.6 } }
   };
 
   return (
     <div 
-      ref={slideRef}
+      ref={containerRef}
+      onClick={handleVideoClick}
       style={{
-        height: '100vh', width: '100%', position: 'relative', overflow: 'hidden',
+        height: '100dvh', width: '100%', position: 'relative', overflow: 'hidden',
         scrollSnapAlign: 'start', 
-        display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'white', textAlign: 'center',
-        backgroundColor: '#000'
+        display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center',
+        backgroundColor: '#000', 
+        cursor: 'pointer'
       }}
     >
-      <motion.img 
-        src="/couple.webp" 
+      {/* LAYER 1: Ambient Blur Background */}
+      <video 
+        ref={bgVideoRef}
+        src="/AnimatedIntro.mp4" 
+        autoPlay
+        muted
+        defaultMuted
+        playsInline
         style={{
           position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
           objectFit: 'cover', 
-          y: yBg, 
-          zIndex: 1 
+          filter: 'blur(35px) brightness(0.8)', 
+          transform: 'scale(1.2)', 
+          zIndex: 0,
+          pointerEvents: 'none' 
         }}
       />
+
+      {/* LAYER 2: Main Foreground Video */}
+      <video 
+        ref={videoRef}
+        src="/AnimatedIntro.mp4" 
+        autoPlay
+        muted
+        defaultMuted
+        playsInline
+        onEnded={handleVideoEnded}
+        style={{
+          position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+          objectFit: 'contain', 
+          zIndex: 1,
+          pointerEvents: 'none'
+        }}
+      />
+
+      {/* Custom Play Overlay for Low Power Mode */}
+      {showPlayOverlay && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          style={{
+            position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.4)', zIndex: 20,
+            display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
+            backdropFilter: 'blur(3px)'
+          }}
+        >
+          <div style={{
+            padding: '15px 30px', border: '1px solid #D4AF37', borderRadius: '30px',
+            backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#fff',
+            fontFamily: '"Great Vibes", cursive', fontSize: '2rem',
+            textShadow: '0px 2px 4px rgba(0,0,0,0.5)'
+          }}>
+            Tap to Play
+          </div>
+        </motion.div>
+      )}
       
-      {/* Vignette Edge Fade Overlay */}
-      <div style={{
-        position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-        background: 'radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.85) 100%)',
-        zIndex: 2 
-      }}></div>
-      
-      {/* 
-        NEW: Using whileInView. 
-        viewport={{ once: false }} ensures it animates every time it enters the screen.
-      */}
+      {/* LAYER 3: Decoupled Text Container */}
       <motion.div 
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: false, amount: 0.3 }} // Triggers when 30% of the element is visible
+        viewport={{ once: false, amount: 0.3 }} 
         style={{ 
-          paddingTop: '10vh', 
-          position: 'relative', 
-          zIndex: 3,            
-          width: '100%',
-          textShadow: '2px 2px 8px rgba(0, 0, 0, 0.6)' 
-        }}
+          position: 'relative', zIndex: 3, width: '100%', height: '100%', 
+          display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' 
+        }} 
       >
-        <motion.p variants={textAnimation} style={{ fontFamily: 'Cormorant, serif', fontSize: '1.2rem', marginBottom: '25vh', letterSpacing: '2px' }}>
+        {/* Absolutely positioned at the top */}
+        <motion.p 
+          variants={{
+            hidden: { opacity: 0, y: -20 },
+            visible: { opacity: 1, y: 0, transition: { duration: 0.8 } }
+          }} 
+          style={{ 
+            position: 'absolute',
+            top: '6dvh', // Pinned exactly to the top, safely below the status bar
+            color: '#4A3728', 
+            fontFamily: '"Great Vibes", cursive', 
+            fontSize: '2.4rem', 
+            fontWeight: 'normal', 
+            margin: 0,
+            width: '100%',
+            textAlign: 'center',
+            textShadow: '0px 0px 8px rgba(255, 255, 255, 0.8)'
+          }}
+        >
           Join us as we begin our forever...
         </motion.p>
         
-        <motion.h1 variants={textAnimation} style={{ fontFamily: '"Great Vibes", cursive', fontSize: 'clamp(60px, 18vw, 90px)', fontWeight: 'normal', margin: 0 }}>
-          Praveena
-        </motion.h1>
-        
-        <motion.div variants={textAnimation} style={{ width: '60px', height: '2px', backgroundColor: '#ffd700', margin: '10px auto', boxShadow: '0px 2px 4px rgba(0,0,0,0.5)' }}></motion.div>
-        
-        <motion.h1 variants={textAnimation} style={{ fontFamily: '"Great Vibes", cursive', fontSize: 'clamp(60px, 18vw, 90px)', fontWeight: 'normal', margin: 0 }}>
-          Hari
-        </motion.h1>
+        {/* The names remain perfectly locked in the middle */}
+        <div style={{ color: '#FFFFFF', textShadow: '1px 2px 5px rgba(0, 0, 0, 0.6)' }}>
+          <motion.h1 variants={leftNameAnimation} style={{ fontFamily: '"Great Vibes", cursive', fontSize: 'clamp(60px, 18vw, 90px)', fontWeight: 'bold', margin: 0, lineHeight: 1.1 }}>
+            Praveena
+          </motion.h1>
+          
+          <motion.div variants={heartAnimation} style={{ color: '#E31C25', fontSize: '2.5rem', margin: '5px auto', lineHeight: 1, textShadow: '0px 2px 4px rgba(0,0,0,0.5)' }}>
+            ♥
+          </motion.div>
+          
+          <motion.h1 variants={rightNameAnimation} style={{ fontFamily: '"Great Vibes", cursive', fontSize: 'clamp(60px, 18vw, 90px)', fontWeight: 'bold', margin: 0, lineHeight: 1.1 }}>
+            Hari
+          </motion.h1>
+        </div>
       </motion.div>
 
-      {/* NEW: Delayed 5-second arrow container */}
+      {/* LAYER 4: Swipe Up Arrow */}
       <motion.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: false }}
-        transition={{ delay: 1.5, duration: 1 }}
+        transition={{ delay: 3, duration: 1 }}
         style={{
-          position: 'absolute',
-          bottom: '40px',
-          display: 'flex',
-          justifyContent: 'center',
-          pointerEvents: 'none',
-          zIndex: 10
+          position: 'absolute', bottom: '40px', display: 'flex', justifyContent: 'center', pointerEvents: 'none', zIndex: 10
         }}
       >
-        <motion.div
-          animate={{ y: [0, -15, 0] }}
-          transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-        >
-          <svg 
-            width="32" 
-            height="32" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="rgba(255, 255, 255, 0.9)" 
-            strokeWidth="2.5" 
-            strokeLinecap="round" 
-            strokeLinejoin="round"
-            style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.6))' }}
-          >
+        <motion.div animate={{ y: [0, -15, 0] }} transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}>
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(255, 255, 255, 0.95)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.6))' }}>
             <polyline points="18 15 12 9 6 15"></polyline>
           </svg>
         </motion.div>

@@ -4,7 +4,7 @@ export default function FinalSlide() {
   const themeColor = '#4A3728';
 
   const slideStyle = {
-    height: '100vh', 
+    height: '100dvh', 
     width: '100%', 
     position: 'relative', 
     overflow: 'hidden',

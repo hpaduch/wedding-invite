@@ -12,7 +12,7 @@ export default function EventCards() {
       time: "7:00 PM",
       venue: "Dwaraka Convention Hall",
       desc: "A joyous evening of music, laughter, and heartfelt blessings. We invite you to share in our happiness as we embark on this new chapter of togetherness.",
-      mapsUrl: "https://maps.app.goo.gl/99SjYxw4eeyYBCtn6",
+      mapsUrl: "https://www.google.com/maps/place/Dwaraka+Chalama+Reddy+Coventional+Hall/@14.7056117,77.6082619,17z/data=!3m1!4b1!4m6!3m5!1s0x3bb6b4d63656dbf9:0xb2889f6425bd87e9!8m2!3d14.7056117!4d77.6082619!16s%2Fg%2F11c6pm6zlv?entry=ttu&g_ep=EgoyMDI2MDcxOS4wIKXMDSoASAFQAw%3D%3D", // Your original link
       calligraphyFont: '"Pinyon Script", cursive',
       bgImage: "/Reception.jpg"
     },
@@ -25,25 +25,23 @@ export default function EventCards() {
       time: "10:30 AM",
       venue: "Dwaraka Convention Hall",    
       desc: "Witness our sacred union as we perform the traditional rituals, pledging our lives to each other amidst the holy chants of the Muhurtham.",
-      mapsUrl: "https://maps.app.goo.gl/your-link",
+      mapsUrl: "https://www.google.com/maps/place/Dwaraka+Chalama+Reddy+Coventional+Hall/@14.7056117,77.6082619,17z/data=!3m1!4b1!4m6!3m5!1s0x3bb6b4d63656dbf9:0xb2889f6425bd87e9!8m2!3d14.7056117!4d77.6082619!16s%2Fg%2F11c6pm6zlv?entry=ttu&g_ep=EgoyMDI2MDcxOS4wIKXMDSoASAFQAw%3D%3D", // Your original link
       calligraphyFont: '"Great Vibes", cursive',
       bgImage: "/wedding-bg.jpg"
     }
   ];
 
-  // Standardized text animation
   const textAnimation = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
   };
 
-  // Reusable delayed arrow for the event slides (White for dark backgrounds)
   const ScrollArrow = () => (
     <motion.div
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: false }}
-      transition={{ delay: 5, duration: 1 }}
+      transition={{ delay: 1.5, duration: 1 }}
       style={{
         position: 'absolute',
         bottom: '40px',
@@ -78,8 +76,8 @@ export default function EventCards() {
     <>
       {events.map((event, index) => (
         <div key={index} style={{
-          position: 'relative', // NEW: Required to anchor the absolute animated arrow
-          height: '100vh', width: '100%', scrollSnapAlign: 'start',
+          position: 'relative', 
+          height: '100dvh', width: '100%', scrollSnapAlign: 'start',
           backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.6)), url(${event.bgImage})`,
           backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center',
           display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
@@ -117,9 +115,9 @@ export default function EventCards() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <MapPin size={18} /> <span>{event.venue}</span>
                 </div>
+                {/* REMOVED target="_blank" to prevent OS-level intent blocking */}
                 <a 
                   href={event.mapsUrl} 
-                  target="_blank" 
                   rel="noreferrer" 
                   style={{
                     backgroundColor: event.nameColor, color: '#000', textDecoration: 'none',
@@ -137,7 +135,6 @@ export default function EventCards() {
             </motion.p>
           </motion.div>
 
-          {/* Mounts the arrow on both event slides */}
           <ScrollArrow />
         </div>
       ))}

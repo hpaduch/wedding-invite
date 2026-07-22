@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 export default function FamilySlide() {
   const slideStyle = {
     position: 'relative', // NEW: Required to anchor the absolute animated arrow
-    height: '100vh', 
+    height: '100dvh', 
     width: '100%',
     boxSizing: 'border-box',
     scrollSnapAlign: 'start',
@@ -51,7 +51,7 @@ export default function FamilySlide() {
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: false }}
-      transition={{ delay: 3, duration: 1 }}
+      transition={{ delay: 1.5, duration: 1 }}
       style={{
         position: 'absolute',
         bottom: '40px',

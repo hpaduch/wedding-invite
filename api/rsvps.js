@@ -25,7 +25,28 @@ export default async function handler(req, res) {
     }
   }
 
+  // --- NEW: Handle DELETE requests for the Admin Dashboard ---
+  if (req.method === 'DELETE') {
+    const { id, all } = req.query; // Extracts query parameters from the URL
+
+    try {
+      if (all === 'true') {
+        // Danger: Wipe entire table and reset IDs
+        await sql`TRUNCATE TABLE rsvps RESTART IDENTITY`;
+        return res.status(200).json({ message: 'All RSVPs cleared successfully' });
+      } else if (id) {
+        // Delete a specific single row
+        await sql`DELETE FROM rsvps WHERE id = ${id}`;
+        return res.status(200).json({ message: `RSVP ${id} deleted successfully` });
+      } else {
+        return res.status(400).json({ error: 'Must provide an ID or set all=true' });
+      }
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
   // Reject any other HTTP methods
-  res.setHeader('Allow', ['GET', 'POST']);
+  res.setHeader('Allow', ['GET', 'POST', 'DELETE']);
   return res.status(405).end(`Method ${req.method} Not Allowed`);
 }
