@@ -12,7 +12,7 @@ export default function EventCards() {
       time: "7:00 PM",
       venue: "Dwaraka Convention Hall",
       desc: "A joyous evening of music, laughter, and heartfelt blessings. We invite you to share in our happiness as we embark on this new chapter of togetherness.",
-      mapsUrl: "https://maps.app.goo.gl/99SjYxw4eeyYBCtn6", // Your original link
+      mapsUrl: "https://www.google.com/maps/place/Dwaraka+Chalama+Reddy+Coventional+Hall/@14.7056117,77.6082619,17z/data=!3m1!4b1!4m6!3m5!1s0x3bb6b4d63656dbf9:0xb2889f6425bd87e9!8m2!3d14.7056117!4d77.6082619!16s%2Fg%2F11c6pm6zlv?entry=ttu&g_ep=EgoyMDI2MDcxOS4wIKXMDSoASAFQAw%3D%3D", // Your original link
       calligraphyFont: '"Pinyon Script", cursive',
       bgImage: "/Reception.jpg"
     },
@@ -25,7 +25,7 @@ export default function EventCards() {
       time: "10:30 AM",
       venue: "Dwaraka Convention Hall",    
       desc: "Witness our sacred union as we perform the traditional rituals, pledging our lives to each other amidst the holy chants of the Muhurtham.",
-      mapsUrl: "https://maps.app.goo.gl/99SjYxw4eeyYBCtn6", // Your original link
+      mapsUrl: "https://www.google.com/maps/place/Dwaraka+Chalama+Reddy+Coventional+Hall/@14.7056117,77.6082619,17z/data=!3m1!4b1!4m6!3m5!1s0x3bb6b4d63656dbf9:0xb2889f6425bd87e9!8m2!3d14.7056117!4d77.6082619!16s%2Fg%2F11c6pm6zlv?entry=ttu&g_ep=EgoyMDI2MDcxOS4wIKXMDSoASAFQAw%3D%3D", // Your original link
       calligraphyFont: '"Great Vibes", cursive',
       bgImage: "/wedding-bg.jpg"
     }
