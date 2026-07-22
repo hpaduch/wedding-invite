@@ -12,7 +12,7 @@ export default function EventCards() {
       time: "7:00 PM",
       venue: "Dwaraka Convention Hall",
       desc: "A joyous evening of music, laughter, and heartfelt blessings. We invite you to share in our happiness as we embark on this new chapter of togetherness.",
-      mapsUrl: "https://www.google.com/maps/place/Dwaraka+Chalama+Reddy+Conventional+Hall",
+      mapsUrl: "https://maps.app.goo.gl/99SjYxw4eeyYBCtn6", // Your original link
       calligraphyFont: '"Pinyon Script", cursive',
       bgImage: "/Reception.jpg"
     },
@@ -25,19 +25,17 @@ export default function EventCards() {
       time: "10:30 AM",
       venue: "Dwaraka Convention Hall",    
       desc: "Witness our sacred union as we perform the traditional rituals, pledging our lives to each other amidst the holy chants of the Muhurtham.",
-      mapsUrl: "https://www.google.com/maps/place/Dwaraka+Chalama+Reddy+Conventional+Hall",
+      mapsUrl: "https://maps.app.goo.gl/99SjYxw4eeyYBCtn6", // Your original link
       calligraphyFont: '"Great Vibes", cursive',
       bgImage: "/wedding-bg.jpg"
     }
   ];
 
-  // Standardized text animation
   const textAnimation = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
   };
 
-  // Reusable delayed arrow for the event slides (White for dark backgrounds)
   const ScrollArrow = () => (
     <motion.div
       initial={{ opacity: 0 }}
@@ -78,7 +76,7 @@ export default function EventCards() {
     <>
       {events.map((event, index) => (
         <div key={index} style={{
-          position: 'relative', // NEW: Required to anchor the absolute animated arrow
+          position: 'relative', 
           height: '100dvh', width: '100%', scrollSnapAlign: 'start',
           backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.6)), url(${event.bgImage})`,
           backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center',
@@ -117,9 +115,9 @@ export default function EventCards() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <MapPin size={18} /> <span>{event.venue}</span>
                 </div>
+                {/* REMOVED target="_blank" to prevent OS-level intent blocking */}
                 <a 
                   href={event.mapsUrl} 
-                  target="_blank" 
                   rel="noreferrer" 
                   style={{
                     backgroundColor: event.nameColor, color: '#000', textDecoration: 'none',
@@ -137,7 +135,6 @@ export default function EventCards() {
             </motion.p>
           </motion.div>
 
-          {/* Mounts the arrow on both event slides */}
           <ScrollArrow />
         </div>
       ))}
